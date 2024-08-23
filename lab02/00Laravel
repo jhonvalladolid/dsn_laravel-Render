@@ -1,0 +1,86 @@
+# Actualiza la lista de paquetes disponibles en tu sistema
+sudo apt-get update
+
+# Verifica el estado del servicio Apache2 para asegurarte de que está instalado o activo
+sudo systemctl status apache2
+
+# Instala Apache2, el servidor web que servirá tus aplicaciones
+sudo apt-get install -y apache2
+
+# Permite el tráfico HTTP y HTTPS a través del firewall para Apache
+sudo ufw allow "Apache Full"
+
+# Verifica nuevamente que Apache2 esté activo y funcionando
+sudo systemctl status apache2
+
+# Comprueba que Apache esté sirviendo correctamente una página web local
+curl http://localhost
+
+# Instala PHP y una serie de módulos necesarios para que Laravel funcione correctamente
+sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd php-xml php-cli php-zip php-bcmath php-tokenizer php-json php-pear php-curl
+
+# Crea un archivo PHP para verificar que PHP esté funcionando en Apache con soporte a php
+sudo echo "<?php phpinfo(); ?>" >> /var/www/html/php.php
+
+# Cambia el grupo propietario de los archivos en /var/www a www-data, el grupo que utiliza Apache
+sudo chgrp -R www-data /var/www
+
+# Cambia los permisos para que el grupo www-data tenga permisos de escritura, lectura y ejecución
+sudo chmod -R 775 /var/www
+
+# Asegura que los nuevos archivos y directorios creados en /var/www hereden los permisos del grupo
+sudo chmod -R g+s /var/www
+
+# Cambia el propietario de todos los archivos en /var/www al usuario "alumno" (cámbialo por tu usuario si es diferente)
+sudo chown -R alumno /var/www/
+
+# Instala PostgreSQL, una base de datos que puedes usar con Laravel
+sudo apt install postgresql
+
+# Edita la configuración de PostgreSQL para permitir conexiones desde cualquier dirección IP
+cd /etc/postgresql/14/main/postgresql.conf
+listen_addresses = '*'
+
+# Inicia sesión como el usuario postgres en la base de datos
+sudo -u postgres psql template1
+
+# Cambia la contraseña del usuario postgres en PostgreSQL
+ALTER USER postgres with encrypted password 'Tecsup00';
+
+# Reinicia el servicio de PostgreSQL para aplicar los cambios
+sudo systemctl restart postgresql.service
+
+# Instala el cliente de PostgreSQL para poder conectarte a la base de datos desde la terminal
+sudo apt install postgresql-client
+
+# Conéctate a la base de datos PostgreSQL desde la terminal
+psql --host localhost --username postgres --password --dbname template1
+
+# Descarga e instala Composer, una herramienta para gestionar dependencias de PHP
+curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/bin --filename=composer
+
+# Verifica que Composer se haya instalado correctamente
+composer -V
+
+# Navega al directorio donde se alojarán tus proyectos Laravel
+cd /var/www/html/
+
+# Crea un nuevo proyecto Laravel llamado 'app01' usando Composer
+sudo composer create-project laravel/laravel app01
+
+# Cambia los permisos para que el almacenamiento de Laravel sea accesible para Apache
+sudo chmod -R 775 /var/www/html/app01/storage
+
+# Navega al directorio del nuevo proyecto Laravel
+cd app01
+
+# Cambia el propietario del proyecto Laravel al usuario "alumno" (ajusta según sea necesario)
+sudo chown -R alumno /var/www/
+
+# Inicia el servidor de desarrollo de Laravel para verificar que todo esté configurado correctamente
+sudo php artisan serve
+
+#Finalmente, valida que Laravel responda en el puerto 8000.
+curl http://localhost:8000
+
+
