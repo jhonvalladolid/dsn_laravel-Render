@@ -1,0 +1,25 @@
+git config -l
+ git config --global user.email "email@dominio.com"
+
+ssh-keygen -t rsa -b 4096 -C "youremail@example.com"
+
+cat id_rsa.pub
+Copiar la llave.
+
+Perfil >> Setting >> SSH and GPG  Keys >> SSH keys >> New SSH Key
+
+Agregar la llave copiada
+
+cd
+cd .ssh/
+vi config
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_rsa
+
+Agregando la llave
+ssh-add ~/.ssh/id_rsa
+
+git remote add origin git@github.com:gdiazes/laravel.git
+git remote -v
