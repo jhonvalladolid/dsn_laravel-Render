@@ -47,6 +47,16 @@ sudo -u postgres psql template1
 # Cambia la contraseña del usuario postgres en PostgreSQL
 ALTER USER postgres with encrypted password 'Tecsup00';
 
+# Configurar la conexión a la base de datos.
+cd /var/www/html/laravel/app01
+vi .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=template1
+DB_USERNAME=postgres
+DB_PASSWORD=Tecsup00
+
 # Reinicia el servicio de PostgreSQL para aplicar los cambios
 sudo systemctl restart postgresql.service
 
