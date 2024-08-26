@@ -40,6 +40,9 @@ sudo apt install postgresql
 # Edita la configuración de PostgreSQL para permitir conexiones desde cualquier dirección IP
 cd /etc/postgresql/14/main/postgresql.conf
 listen_addresses = '*'
+vi pg_hba.conf
+# Agregar al final:
+host    template1       all             192.168.21.100/24       scram-sha-256
 
 # Inicia sesión como el usuario postgres en la base de datos
 sudo -u postgres psql template1
