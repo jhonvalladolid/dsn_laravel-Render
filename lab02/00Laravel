@@ -1,5 +1,6 @@
 # Actualiza la lista de paquetes disponibles en tu sistema
 sudo apt-get update
+sudo apt install vim
 
 # Verifica el estado del servicio Apache2 para asegurarte de que está instalado o activo
 sudo systemctl status apache2
@@ -8,6 +9,7 @@ sudo systemctl status apache2
 sudo apt-get install -y apache2
 
 # Permite el tráfico HTTP y HTTPS a través del firewall para Apache
+sudo apt install -y ufw
 sudo ufw allow "Apache Full"
 
 # Verifica nuevamente que Apache2 esté activo y funcionando
@@ -18,9 +20,6 @@ curl http://localhost
 
 # Instala PHP y una serie de módulos necesarios para que Laravel funcione correctamente
 sudo apt install php libapache2-mod-php php-mbstring php-xmlrpc php-soap php-gd php-xml php-cli php-zip php-bcmath php-tokenizer php-json php-pear php-curl
-
-# Crea un archivo PHP para verificar que PHP esté funcionando en Apache con soporte a php
-sudo echo "<?php phpinfo(); ?>" >> /var/www/html/php.php
 
 # Cambia el grupo propietario de los archivos en /var/www a www-data, el grupo que utiliza Apache
 sudo chgrp -R www-data /var/www
@@ -34,13 +33,18 @@ sudo chmod -R g+s /var/www
 # Cambia el propietario de todos los archivos en /var/www al usuario "alumno" (cámbialo por tu usuario si es diferente)
 sudo chown -R alumno /var/www/
 
+# Crea un archivo PHP para verificar que PHP esté funcionando en Apache con soporte a php
+sudo echo "<?php phpinfo(); ?>" >> /var/www/html/php.php
+ curl http://localhost/php.php
+
 # Instala PostgreSQL, una base de datos que puedes usar con Laravel
 sudo apt install postgresql
+sudo apt-get install php-pgsql
 
 # Edita la configuración de PostgreSQL para permitir conexiones desde cualquier dirección IP
-cd /etc/postgresql/14/main/postgresql.conf
-listen_addresses = '*'
-vi pg_hba.conf
+sudo vi /etc/postgresql/16/main/postgresql.conf
+listen_addresses = 'localhost'
+sudo vi /etc/postgresql/16/main/pg_hba.conf
 # Agregar al final:
 host    template1       all             192.168.21.100/24       scram-sha-256
 
@@ -49,16 +53,12 @@ sudo -u postgres psql template1
 
 # Cambia la contraseña del usuario postgres en PostgreSQL
 ALTER USER postgres with encrypted password 'Tecsup00';
+\q
 
 # Configurar la conexión a la base de datos.
-cd /var/www/html/laravel/app01
-vi .env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=template1
-DB_USERNAME=postgres
-DB_PASSWORD=Tecsup00
+
+
+
 
 # Reinicia el servicio de PostgreSQL para aplicar los cambios
 sudo systemctl restart postgresql.service
@@ -68,6 +68,7 @@ sudo apt install postgresql-client
 
 # Conéctate a la base de datos PostgreSQL desde la terminal
 psql --host localhost --username postgres --password --dbname template1
+\q
 
 # Descarga e instala Composer, una herramienta para gestionar dependencias de PHP
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/bin --filename=composer
@@ -76,24 +77,35 @@ curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/bin 
 composer -V
 
 # Navega al directorio donde se alojarán tus proyectos Laravel
-cd /var/www/html/
+
+
 
 # Crea un nuevo proyecto Laravel llamado 'app01' usando Composer
-sudo composer create-project laravel/laravel app01
+cd  /var/www/html/
+mkdir laravel
+cd laravel
+
+composer create-project laravel/laravel app01
+cd app01
+vi .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=template1
+DB_USERNAME=postgres
+DB_PASSWORD=Tecsup00
 
 # Cambia los permisos para que el almacenamiento de Laravel sea accesible para Apache
-sudo chmod -R 775 /var/www/html/app01/storage
-
-# Navega al directorio del nuevo proyecto Laravel
-cd app01
+sudo chmod -R 775 /var/www/html/laravel/app01/storage
 
 # Cambia el propietario del proyecto Laravel al usuario "alumno" (ajusta según sea necesario)
 sudo chown -R alumno /var/www/
 
 # Inicia el servidor de desarrollo de Laravel para verificar que todo esté configurado correctamente
-sudo php artisan serve
+php artisan migrate
+php artisan serve --host=192.168.21.100 --port=8000
 
 #Finalmente, valida que Laravel responda en el puerto 8000.
-curl http://localhost:8000
+curl http://192.168.21.100:8000
 
 
